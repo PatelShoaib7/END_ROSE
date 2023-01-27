@@ -1,5 +1,6 @@
 const  argon2 = require("argon2");
 const jwt = require("jsonwebtoken");
+
 const userModel = require("../Models/User");
 require('dotenv').config();
 
@@ -11,7 +12,7 @@ const AuthentiCation =async (req, res, next)=>{
       console.log(user)
       const password_Verification =user ? await argon2.verify(user.password , password) : false
       if(password_Verification== false){
-        res.send({msg:"Ooops Wrong Crentials Email Is Not Registerd "})
+        res.send({msg:"Ooops Wrong Crentials Check Email & Password Again"})
      }else{
         req.body.userID =user._id;
         next()
