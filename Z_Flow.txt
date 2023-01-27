@@ -1,0 +1,15 @@
+1.SIGN UP PAGE   REQUIREMENT
+    1. name email password mob_Num     /signup
+    2.Encpypted while saving Hashed
+
+2.LOGIN PAGE    REQUIREMENT            /login
+    1. email && password 
+    2. RETUREN JWT_TOKEN Of Hole User DATA
+
+3.UPDATE USER DETAILS 
+    1.Accepet new Details And Update    /password/:id
+
+4.REST PASSWORD                         /daetial/:id
+    1. Take Both Old And New Passord 
+    2. Chek Old Password In DataBase
+    3.Then Only Update New Password 
