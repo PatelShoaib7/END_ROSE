@@ -77,15 +77,20 @@ app.patch("/details/edit/:paramId",async (req, res)=>{
     const {userID} = req.body;
     const {paramId} = req.params;
    if(`:${userID}` === paramId){
-      const {email , name, mob_num}= req.body;
-         const chek_For_User = await  userModel.find({userID});
+      try{
+            const {email , name, mob_num}= req.body;
+            const chek_For_User = await  userModel.find({userID});
             if(email || name || mob_num){
             const save_User_Details = await userModel.findOneAndUpdate({userID},{...chek_For_User,mob_num:mob_num ,name:name, email:email})
             console.log(save_User_Details )
-            res.send({msg:"Sucess Fully changed Details "})
-          }else{
-      res.send({msg:"Error In Updating Details Or Wrong Required Credentials "})
+             res.send({msg:"Sucess Fully changed Details "})
+          }
+        }
+          catch(err){
+         res.send({msg:"Error In Updating Details Or Wrong Required Credentials "})
     }
+  }else{
+    res.send({msg:'Error In varifying Token'})
   }
  })
 app.get("/getuser/:id",async (req, res)=>{
