@@ -7,12 +7,19 @@ const argon2 = require('argon2')
 const JWT_SECRET_KEY=process.env.JWT_JWT_SECRET_KEY;
 const PORT = process.env.PORT|| 7000;
 const connection = require("./DataBase");
-const userModel = require('./Models/User');
 const {AuthoRization ,AuthentiCation } = require("./MiddleWare/AuthentiCation")
+const userModel = require('./Models/User');
 app.use(express.json())
 app.use(cors())
 app.use(express.urlencoded({extended:true}))
 
+let GITHUB_TOKEN ;
+// app.get("/",(req, res)=>{
+//       res.sendFile(__dirname + "/index.html")
+//    })
+app.use(express.json())
+app.use(cors())
+app.use(express.urlencoded({extended:true}))
 
 
 app.post("/signup", async (req, res)=>{ 
@@ -40,37 +47,46 @@ app.post("/login", AuthentiCation, async (req, res)=>{
 
  app.use(AuthoRization);
 
-  app.patch("/pass/edit/:id",async (req, res)=>{
-    const {userID} = req.params
-     //console.log(req.body)
-      let {curr_password , new_password} = req.body;
-      if(curr_password){
-         const  Curr_USER_Data = await userModel.findOne({userID});
-         const old_PASS_Verfication = await argon2.verify(Curr_USER_Data.password,curr_password);
-         const hash_NEW_Pass = await argon2.hash(new_password)
-         const save_new_pass = await userModel.findOneAndUpdate({curr_password},{ password:hash_NEW_Pass});
-         res.send({msg:"saved to data Base "})
-    }
-    else{
-      res.send({msg:"Bad Request 404 InValid Credientials "})
-    }
+  app.patch("/pass/edit/:userID",async (req, res)=>{
+       const {userID} = req.body;
+       const {new_password , curr_password } = req.body;
+      const paramId = req.params.userID;
+      if(`:${userID}` !== paramId){
+        res.send({msg:"Error In Verifying Token"})
+        }else{
+         try{
+              const Srach_SEVD_PassWord =  await userModel.findOne({userID});
+              const OLD_SAVED_PASS = Srach_SEVD_PassWord.password;
+              console.log(Srach_SEVD_PassWord)
+              const curr_PAss_VERIFICATION = await argon2.verify(OLD_SAVED_PASS, curr_password);
+              if(!curr_PAss_VERIFICATION){
+                res.send({msg:'Password Verification Errror InValid Current Password'})
+              }else{
+                const hand_New_PASS = await argon2.hash(new_password)
+                const update_PASS = await userModel.findOneAndUpdate({OLD_SAVED_PASS}, {password:hand_New_PASS});
+                console.log(update_PASS)
+                 res.send({msg:'Password Saved SucessFully '})
+              }
+        }catch(err){
+          console.log(err);
+          res.send({msg:'Password Verification Went Wrong Check Creditials Again'})
+        }
+     }
    })
- 
 app.patch("/details/edit/:paramId",async (req, res)=>{
     const {userID} = req.body;
-    const {paramId} = req.params
+    const {paramId} = req.params;
    if(`:${userID}` === paramId){
       const {email , name, mob_num}= req.body;
-      const chek_For_User = await  userModel.find({userID});
-     if(chek_For_User){
-      const save_User_Details = await userModel.findOneAndUpdate({userID},{...chek_For_User,mob_num:mob_num ,name:name, email:email})
-      console.log(save_User_Details )
-      res.send({msg:"Sucess Fully changed Details "})
+         const chek_For_User = await  userModel.find({userID});
+            if(email || name || mob_num){
+            const save_User_Details = await userModel.findOneAndUpdate({userID},{...chek_For_User,mob_num:mob_num ,name:name, email:email})
+            console.log(save_User_Details )
+            res.send({msg:"Sucess Fully changed Details "})
+          }else{
+      res.send({msg:"Error In Updating Details Or Wrong Required Credentials "})
     }
   }
-  else{
-      res.send({msg:"Error In Updating Details "})
-    }
  })
 app.get("/getuser/:id",async (req, res)=>{
     const userId= req.params;
