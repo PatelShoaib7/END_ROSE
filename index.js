@@ -105,7 +105,7 @@ app.get("/getuser/:id",async (req, res)=>{
    })
 
 app.get("/",(req, res)=>{
-     if(req.url == "/" ){'
+     if(req.url == "/" ){
         return res.send("Hellow World !)
         }else{
       return res.send({ "errMsg" : "Ooops ! Request Not Found " })
