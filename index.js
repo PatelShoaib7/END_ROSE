@@ -14,9 +14,7 @@ app.use(cors())
 app.use(express.urlencoded({extended:true}))
 
 let GITHUB_TOKEN ;
-// app.get("/",(req, res)=>{
-//       res.sendFile(__dirname + "/index.html")
-//    })
+
 app.use(express.json())
 app.use(cors())
 app.use(express.urlencoded({extended:true}))
@@ -83,14 +81,14 @@ app.patch("/details/edit/:paramId",async (req, res)=>{
             if(email || name || mob_num){
             const save_User_Details = await userModel.findOneAndUpdate({userID},{...chek_For_User,mob_num:mob_num ,name:name, email:email})
             console.log(save_User_Details )
-             res.send({msg:"Sucess Fully changed Details "})
+            return res.send({msg:"Sucess Fully changed Details "})
           }
         }
           catch(err){
-         res.send({msg:"Error In Updating Details Or Wrong Required Credentials "})
+        return res.send({msg:"Error In Updating Details Or Wrong Required Credentials "})
     }
   }else{
-    res.send({msg:'Error In varifying Token'})
+    return es.send({msg:'Error In varifying Token'})
   }
  })
 app.get("/getuser/:id",async (req, res)=>{
@@ -100,13 +98,19 @@ app.get("/getuser/:id",async (req, res)=>{
     let {name , email , mob_num , userID}= findUser._doc
       if(findUser){
         const User= { name , email , mob_num , userID}
-        res.send({msg:"user data", User })
+        return res.send({msg:"user data", User })
       }else{
-        res.send({msg:"ooops not a verifide User "})
+        return res.send({msg:"ooops not a verifide User "})
       }
    })
 
-
+app.get("/",(req, res)=>{
+     if(req.url=="/){'
+        return res.send("Hellow World !)
+        }else{
+      return res.send({ "errMsg" : "Ooops ! Request Not Found " })
+     }
+   })
 app.listen(PORT, async ()=>{
     try{ await connection;
           console.log('connected to dataBase Suceefully');
